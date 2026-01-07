@@ -30,7 +30,7 @@ C:\Python27\python.exe -m pip install opencv-python==4.2.0.32
 
 ![image-20251013142508487](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251013142508487.png)
 
-## 下载pose模型
+## 下载测试pose模型
 
 OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.zhihu.com/search?content_id=10017670&content_type=Article&match_order=1&q=卡耐基梅隆大学&zhida_source=entity)（CMU）基于[卷积神经网络](https://zhida.zhihu.com/search?content_id=10017670&content_type=Article&match_order=1&q=卷积神经网络&zhida_source=entity)和监督学习并以caffe为框架开发的开源库。可以实现人体动作、面部表情、手指运动等姿态估计。适用于单人和多人，具有极好的鲁棒性。是世界上首个基于深度学习的实时多人二维姿态估计应用，基于它的实例如雨后春笋般涌现。人体姿态估计技术在体育健身、动作采集、3D试衣、舆情监测等领域具有广阔的应用前景，人们更加熟悉的应用就是抖音尬舞机。
 
@@ -54,6 +54,8 @@ OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.z
         self.net = cv2.dnn.readNetFromCaffe(self.protoFile, self.weightsFile)
 
 ```
+
+## 部署测试低版本Yolo
 
 今日工作把简单版本的Yolo3搭载在py2.7环境中捕获输入视频中的物体并圈出来。
 
@@ -106,3 +108,143 @@ OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.z
                         #print("height=",height,"width=",width)
 ```
 
+## 键盘运动控制
+
+在tello edu的tkinter界面中同时有运动控制的一个子界面。可以实现如下的运动控制功能：
+
+1.指定距离的前后左右移动
+
+2.指定高度的向上运动和向下运动
+
+3.起飞和落地
+
+4.指定角度的顺时针旋转和逆时针旋转
+
+![image-20251019170000548](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251019170000548.png)
+
+其相关代码如下：
+
+首先是封装了向tello edu发送信息的函数。send_command(self,command)
+
+```python
+    def send_command(self, command):
+        """
+        Send a command to the Tello and wait for a response.
+
+        :param command: Command to send.
+        :return (str): Response from Tello.
+
+        """
+
+        print (">> send cmd: {}".format(command))
+        self.abort_flag = False
+        timer = threading.Timer(self.command_timeout, self.set_abort_flag)
+
+        self.socket.sendto(command.encode('utf-8'), self.tello_address)
+
+        timer.start()
+        while self.response is None:
+            if self.abort_flag is True:
+                break
+        timer.cancel()
+        
+        if self.response is None:
+            response = 'none_response'
+        else:
+            response = self.response.decode('utf-8')
+
+        self.response = None
+
+        return response
+```
+
+后续每次向Tello无人机发送指令都可以直接把command字符串填入send_command函数来实现。比如起飞指令如下：
+
+```python
+
+    def takeoff(self):
+        """
+        Initiates take-off.
+
+        Returns:
+            str: Response from Tello, 'OK' or 'FALSE'.
+
+        """
+
+        return self.send_command('takeoff')
+```
+
+而在ui界面控制代码中通过把按键-动作进行绑定并使得按下按键就可以执行相应的动作例如：
+
+```python
+        self.tmp_f.bind('<KeyPress-Left>', self.on_keypress_left)
+
+```
+
+```python
+    def on_keypress_left(self, event):
+        print "left %d m" % self.distance
+        self.telloMoveLeft(self.distance)
+
+```
+
+## 基于fast的特征提取
+
+FAST算法全名为：(Features from Accelerated Segment Test)是一个特征点提取算法的缩写。。它原理非常简单，**遍历所有的像素点，判断当前像素点是不是特征点的唯一标准就是在以当前像素点为圆心以3像素为半径画个圆（圆上有16个点），统计这16个点的像素值与圆心像素值相差比较大的点的个数。超过9个差异度很大的点那就认为圆心那个像素点是一个特征点**。
+
+特征点提取的实际上是图像中的角点，也就是图像中颜色变化比较大的点，可以作为一个特征。
+
+![image-20251019171356706](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251019171356706.png)
+
+应用fast算法提取特征点的图例如上图所示。
+
+fast算法的实现在opencv中集成度已经很高了，比较简单。此为其核心代码：
+
+```python
+                fast = cv2.FastFeatureDetector_create()
+                keypoints = fast.detect(frame, None)
+```
+
+
+
+## opencv-python系列之稀疏光流
+
+光流是物体或者摄像头的运动导致的两个连续帧之间的图像对象的视觉运动的模式。它是一个向量场，每个向量是一个位移矢量，显示了从第一帧到第二帧的点的移动，如图：
+
+![image.png](http://uphotos.eepw.com.cn/zhuzhaokun1987/pics/1596977465890361.png)
+
+Opencv中使用cv2.calcOpticalFlowPyrLK()函数计算一个稀疏特征集的光流，使用金字塔中的迭代 Lucas-Kanade 方法。
+
+详细代码如下：
+
+```python
+                new_frame=frame
+                feature_params = dict(maxCorners=100,
+                      qualityLevel=0.3,
+                      minDistance=7,
+                      blockSize=7)
+                lk_params = dict(winSize=(15, 15),
+                                maxLevel=2,
+                                criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+                
+                color = np.random.randint(0, 255, (100, 3))               
+                old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
+                p0 = cv2.goodFeaturesToTrack(old_gray, mask=None, **feature_params)#find interesting points       
+                mask = np.zeros_like(old_frame)  #add mask to draw trajety
+
+                frame_gray = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)
+                p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)#calculate movement of interesting points
+                good_new = p1[st == 1]
+                good_old = p0[st == 1]
+                for i, (new, old) in enumerate(zip(good_new, good_old)):
+                    a, b = new.ravel()
+                    c, d = old.ravel()
+                    mask = cv2.line(mask, (a, b), (c, d), color[i].tolist(), 2)#draw a line between new and old points
+                    frame=cv2.circle(frame, (a, b), 5, color[i].tolist(), -1) #it graw circls on special points
+                frame=cv2.add(frame,mask)
+                old_gray=frame_gray.copy()
+                p0=good_new.reshape(-1,1,2)
+                old_frame=frame#after is last frame
+```
+
+逻辑是在上一帧的灰度图用goodFeaturesToTrack计算感兴趣的点并在下一帧也这样做，最后在下一帧的图中用线把前后两帧的点连接起来，这就是光流法。
