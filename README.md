@@ -30,6 +30,34 @@ C:\Python27\python.exe -m pip install opencv-python==4.2.0.32
 
 ![image-20251013142508487](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251013142508487.png)
 
+## 运行说明
+
+运行的文件夹名字应当为：Tello_Video_With_Pose_Recognition1
+
+在该文件夹下面的Model文件夹下还具有着来自Pose和yolov3的权重和配置文件：
+
+![image-20260111091451947](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111091451947.png)
+
+运行时候应当首先开机tello无人机，再打开电脑WIFI连上tello，再运行main.py在其中开启通信和主任务循环,在终端中敲入下面的指令：
+
+```bash
+C:\Python27\python.exe main.py
+```
+
+随后就进入了控制界面：
+
+![image-20260111094058442](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094058442.png)
+
+可以看到其中集成了多个功能：open command pannel功能指向了键盘控制无人机飞行。
+
+optical tracking status功能指向了是否开启LK光流**特征追踪**。
+
+fast recognition指向了是否开启fast **特征提取**。
+
+yolo recognition指向了yolo目标检测和实时bbox展现。
+
+pose recognition指向了开启姿势检测。
+
 ## 下载测试pose模型
 
 OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.zhihu.com/search?content_id=10017670&content_type=Article&match_order=1&q=卡耐基梅隆大学&zhida_source=entity)（CMU）基于[卷积神经网络](https://zhida.zhihu.com/search?content_id=10017670&content_type=Article&match_order=1&q=卷积神经网络&zhida_source=entity)和监督学习并以caffe为框架开发的开源库。可以实现人体动作、面部表情、手指运动等姿态估计。适用于单人和多人，具有极好的鲁棒性。是世界上首个基于深度学习的实时多人二维姿态估计应用，基于它的实例如雨后春笋般涌现。人体姿态估计技术在体育健身、动作采集、3D试衣、舆情监测等领域具有广阔的应用前景，人们更加熟悉的应用就是抖音尬舞机。
@@ -55,11 +83,13 @@ OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.z
 
 ```
 
+下面是pose模型效果展示：
+
+![image-20260111094759496](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094759496.png)
+
 ## 部署测试低版本Yolo
 
-今日工作把简单版本的Yolo3搭载在py2.7环境中捕获输入视频中的物体并圈出来。
-
-整体流程是点击yolo按钮后开始识别，然后处理返回的x,y,h,w在图中画出来。
+简单版本的Yolo3搭载在py2.7环境中捕获输入视频中的物体并圈出来。整体流程是点击yolo按钮后开始识别，然后处理返回的x,y,h,w在图中画出来。yolov3的模型比较难找。
 
 ![image-20251013214503015](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251013214503015.png)
 
@@ -205,9 +235,11 @@ fast算法的实现在opencv中集成度已经很高了，比较简单。此为�
                 keypoints = fast.detect(frame, None)
 ```
 
+下面是效果展示：
 
+![image-20260111094536815](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094536815.png)
 
-## opencv-python系列之稀疏光流
+## 稀疏LK光流特征追踪
 
 光流是物体或者摄像头的运动导致的两个连续帧之间的图像对象的视觉运动的模式。它是一个向量场，每个向量是一个位移矢量，显示了从第一帧到第二帧的点的移动，如图：
 
@@ -248,3 +280,7 @@ Opencv中使用cv2.calcOpticalFlowPyrLK()函数计算一个稀疏特征集的光
 ```
 
 逻辑是在上一帧的灰度图用goodFeaturesToTrack计算感兴趣的点并在下一帧也这样做，最后在下一帧的图中用线把前后两帧的点连接起来，这就是光流法。
+
+下面是效果展示：
+
+![image-20260111094648543](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094648543.png)
