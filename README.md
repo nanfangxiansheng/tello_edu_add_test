@@ -28,7 +28,7 @@ C:\Python27\python.exe -m pip install opencv-python==4.2.0.32
 
 而不是仅仅把libh264decoder.pyd文件放在该文件夹下，.pyd文件就相当于一个动态链接库.so文件，还需要dll文件来支持。
 
-![image-20251013142508487](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251013142508487.png)
+<img width="1411" height="1218" alt="image" src="https://github.com/user-attachments/assets/6bd30c8e-722b-4951-abdf-8d1dd10e41fb" />
 
 ## 运行说明
 
@@ -36,7 +36,7 @@ C:\Python27\python.exe -m pip install opencv-python==4.2.0.32
 
 在该文件夹下面的Model文件夹下还具有着来自Pose和yolov3的权重和配置文件：
 
-![image-20260111091451947](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111091451947.png)
+<img width="1321" height="456" alt="image" src="https://github.com/user-attachments/assets/5301ff4b-4697-4670-b268-a01bfa653d6b" />
 
 运行时候应当首先开机tello无人机，再打开电脑WIFI连上tello，再运行main.py在其中开启通信和主任务循环,在终端中敲入下面的指令：
 
@@ -46,7 +46,7 @@ C:\Python27\python.exe main.py
 
 随后就进入了控制界面：
 
-![image-20260111094058442](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094058442.png)
+<img width="2559" height="1526" alt="image" src="https://github.com/user-attachments/assets/4f3034fc-783c-4dd2-8394-700ea4def678" />
 
 可以看到其中集成了多个功能：open command pannel功能指向了键盘控制无人机飞行。
 
@@ -85,13 +85,14 @@ OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.z
 
 下面是pose模型效果展示：
 
-![image-20260111094759496](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094759496.png)
+<img width="2559" height="1464" alt="image" src="https://github.com/user-attachments/assets/85f2cb28-22fd-46c7-a97b-3fce5b12fe5a" />
 
 ## 部署测试低版本Yolo
 
-简单版本的Yolo3搭载在py2.7环境中捕获输入视频中的物体并圈出来。整体流程是点击yolo按钮后开始识别，然后处理返回的x,y,h,w在图中画出来。yolov3的模型比较难找。
+简单版本的Yolo3搭载在py2.7环境中捕获输入视频中的物体并圈出来。整体流程是点击yolo按钮后开始识别，然后处理返回的x,y,h,w在图中画出来。yolov3的模型比较难找。现在提供了一个下载链接：
+https://gitcode.com/open-source-toolkit/c20d8/
 
-![image-20251013214503015](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251013214503015.png)
+<img width="1280" height="1707" alt="image" src="https://github.com/user-attachments/assets/8ba46762-6d04-45c3-8a52-ff31a8f36b86" />
 
  详细代码过程如下。首先是加载yolo3低版本模型的代码：
 
@@ -150,7 +151,7 @@ OpenPose人体姿态识别项目是美国[卡耐基梅隆大学](https://zhida.z
 
 4.指定角度的顺时针旋转和逆时针旋转
 
-![image-20251019170000548](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251019170000548.png)
+<img width="762" height="513" alt="image" src="https://github.com/user-attachments/assets/7e09d286-152b-45b5-8447-cf7423fcc0ef" />
 
 其相关代码如下：
 
@@ -224,9 +225,9 @@ FAST算法全名为：(Features from Accelerated Segment Test)是一个特征点
 
 特征点提取的实际上是图像中的角点，也就是图像中颜色变化比较大的点，可以作为一个特征。
 
-![image-20251019171356706](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20251019171356706.png)
+<img width="376" height="668" alt="image" src="https://github.com/user-attachments/assets/8dbbd906-c8ac-4c74-8c9b-12c9be34eadd" />
 
-应用fast算法提取特征点的图例如上图所示。
+应用fast算法提取特征点的图例如上图所示。可以看出，提取出的特征点有很多在物体的边缘
 
 fast算法的实现在opencv中集成度已经很高了，比较简单。此为其核心代码：
 
@@ -237,13 +238,13 @@ fast算法的实现在opencv中集成度已经很高了，比较简单。此为�
 
 下面是效果展示：
 
-![image-20260111094536815](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094536815.png)
+<img width="1641" height="1346" alt="image" src="https://github.com/user-attachments/assets/eeca60a9-5745-4f6f-8575-7df6f2ff0524" />
 
 ## 稀疏LK光流特征追踪
 
 光流是物体或者摄像头的运动导致的两个连续帧之间的图像对象的视觉运动的模式。它是一个向量场，每个向量是一个位移矢量，显示了从第一帧到第二帧的点的移动，如图：
 
-![image.png](http://uphotos.eepw.com.cn/zhuzhaokun1987/pics/1596977465890361.png)
+<img width="435" height="194" alt="image" src="https://github.com/user-attachments/assets/f61880ab-ec82-4122-94c6-a9eb463e3ecd" />
 
 Opencv中使用cv2.calcOpticalFlowPyrLK()函数计算一个稀疏特征集的光流，使用金字塔中的迭代 Lucas-Kanade 方法。
 
@@ -283,4 +284,4 @@ Opencv中使用cv2.calcOpticalFlowPyrLK()函数计算一个稀疏特征集的光
 
 下面是效果展示：
 
-![image-20260111094648543](C:\Users\26871\AppData\Roaming\Typora\typora-user-images\image-20260111094648543.png)
+<img width="2559" height="1284" alt="image" src="https://github.com/user-attachments/assets/755d30ec-12d8-4da3-955a-757899a006be" />
